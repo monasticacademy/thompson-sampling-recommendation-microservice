@@ -1,0 +1,55 @@
+
+definitions:
+  Arm:
+    type: object
+    properties:
+      mean:
+        type: number
+      variance:
+        type: number
+      effective_size:
+        type: number
+      label:
+        type: string
+
+paths:
+  /update:
+    post:
+      summary: Update arm information
+      description: Updates the information of a given arm and returns the new arm information.
+      parameters:
+        - name: update_arm
+          in: body
+          schema:
+            $ref: '#/definitions/Arm'
+        - name: reward
+          in: body
+          type: number
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              arm:
+                $ref: '#/definitions/Arm'
+
+  /choose:
+    post:
+      summary: Choose an arm
+      description: Takes all the arms and their information, then chooses an arm and returns it.
+      parameters:
+        - name: arms
+          in: body
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Arm'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              chosen_arm:
+                type: number

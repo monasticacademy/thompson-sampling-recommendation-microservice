@@ -1,0 +1,6 @@
+
+flask
+flasgger
+werkzeug
+gunicorn
+thompson-sampling
