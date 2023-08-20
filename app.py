@@ -1,4 +1,3 @@
-
 import sys
 import os
 import logging
@@ -34,53 +33,40 @@ def requires_auth(f):
     return wrapped
 
 @app.route('/update', methods=['POST'])
-@swag_from('swagger.yaml', endpoint='update')
+@swag_from('swagger.yaml', endpoint='update_endpoint')  # Change the endpoint name
 @requires_auth
 def update():
     request_data = None
     if request.content_type == 'application/json':
         request_data = request.get_json()
-
     try:
         if request_data is None:
             return jsonify({"error": "Invalid content type"}), 400
-
         update_arm = request_data['update_arm']
         reward = request_data['reward']
-
         prior = BetaPrior()
         prior.add_one(mean=update_arm['mean'], variance=update_arm['variance'], effective_size=update_arm['effective_size'], label=update_arm['label'])
-
         experiment = BernoulliExperiment(priors=prior)
         experiment.add_rewards([{"label": update_arm['label'], "reward": reward}])
-
         new_arm = [{"label": arm.label, "mean": arm.mean, "variance": arm.variance, "effective_size": arm.effective_size} for arm in experiment.arms]
         return jsonify({"arm": new_arm})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route('/choose', methods=['POST'])
-@swag_from('swagger.yaml', endpoint='choose')
+@swag_from('swagger.yaml', endpoint='choose_endpoint')  # Change the endpoint name
 @requires_auth
 def choose():
     request_data = None
     if request.content_type == 'application/json':
         request_data = request.get_json()
-
     try:
         if request_data is None:
             return jsonify({"error": "Invalid content type"}), 400
-
         arms = request_data['arms']
-
-        # Validate data
-        if not validate_arms(arms):
-            return jsonify({"error": "Invalid arm data"}), 400
-
         priors = BetaPrior()
         for arm in arms:
             priors.add_one(mean=arm['mean'], variance=arm['variance'], effective_size=arm['effective_size'], label=arm['label'])
-
         experiment = BernoulliExperiment(priors=priors)
         chosen_arm = experiment.choose_arm()
         return jsonify({"chosen_arm": chosen_arm})
