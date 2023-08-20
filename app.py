@@ -33,7 +33,7 @@ def requires_auth(f):
     return wrapped
 
 @app.route('/update', methods=['POST'])
-@swag_from('swagger.yaml', endpoint='update_endpoint')  # Change the endpoint name
+@swag_from('swagger.yaml')  # Change the endpoint name
 @requires_auth
 def update():
     request_data = None
@@ -54,7 +54,7 @@ def update():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/choose', methods=['POST'])
-@swag_from('swagger.yaml', endpoint='choose_endpoint')  # Change the endpoint name
+@swag_from('swagger.yaml')  # Change the endpoint name
 @requires_auth
 def choose():
     request_data = None
